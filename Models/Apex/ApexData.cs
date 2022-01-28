@@ -2,6 +2,8 @@ namespace ApexDataExtracter.Models.Apex;
 
 public class ApexData
 {
+    public ApexData(){}
+    
     public ApexData(Status status)
     {
         //Convert horribad format into something usable..
@@ -18,7 +20,7 @@ public class ApexData
     }
     
     public DateTimeOffset Timestamp { get; set; }
-    public string ApexName { get; set; }
+    public string ApexName { get; set; } = null!;
     public double Temp { get; set; }
     public double Ph { get; set; }
     public double Alk { get; set; }

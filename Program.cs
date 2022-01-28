@@ -12,14 +12,17 @@ var build =  configBuilder.Build();
 var services = new ServiceCollection()
     .Configure<ApexConfig>(build.GetSection("Apex"))
     .Configure<SlackConfig>(build.GetSection("Slack"))
+    .Configure<GitConfig>(build.GetSection("Git"))
     .AddSingleton<ApexService>()
     .AddSingleton<LoggingService>()
+    .AddSingleton<GitService>()
     .BuildServiceProvider();
     
     
 var apexService = services.GetRequiredService<ApexService>();
 var loggingService = services.GetRequiredService<LoggingService>();
+var gitService = services.GetRequiredService<GitService>();
 var apexData = await apexService.GetApexDataAsync();
 await loggingService.Log(apexData);
-
+await gitService.PushDataToGithub(apexData);
 
