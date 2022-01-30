@@ -37,7 +37,9 @@ public class LoggingService
     }
     
     private async Task SlackLog(ApexData apexData, string logMesssage)
-    {
+    {       
+        if (!_config.Enabled)
+            return;
         var attachement =
             (apexData.ATO?.status[2] == "OK") ? null : new
             {

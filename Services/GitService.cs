@@ -10,17 +10,20 @@ namespace ApexDataExtracter.Services;
 public class GitService
 {
     private readonly GitHubClient _client;
+    private readonly bool _enabled;
 
     public GitService(IOptions<GitConfig> config)
     {
         var realConfig = config.Value;
+        _enabled = realConfig.Enabled;
         _client = new GitHubClient(new ProductHeaderValue("TankMate"));;
         _client.Credentials = new Credentials(realConfig.PAT);
     }
 
     public async Task PushDataToGithub(ApexData apexData)
     {
-        
+        if (!_enabled)
+            return;
         var (owner, repoName, filePath, branch) = ("troycornwall", "TankDetails", 
             "status.json", "main");
      
@@ -40,7 +43,7 @@ public class GitService
         statuses.Add(apexData);
         
         var updateResult = await _client.Repository.Content.UpdateFile(owner, repoName, filePath,
-            new UpdateFileRequest("BOT; Updated tank details", JsonConvert.SerializeObject(statuses), file.Sha));
+            new UpdateFileRequest("BOT; Updated tank details", JsonConvert.SerializeObject(statuses, Formatting.Indented), file.Sha));
         
         await Task.CompletedTask;
     }
