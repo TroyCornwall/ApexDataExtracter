@@ -23,6 +23,6 @@ var apexService = services.GetRequiredService<ApexService>();
 var loggingService = services.GetRequiredService<LoggingService>();
 var gitService = services.GetRequiredService<GitService>();
 var apexData = await apexService.GetApexDataAsync();
-await loggingService.Log(apexData);
-await gitService.PushDataToGithub(apexData);
+var difference = await gitService.PushDataToGithub(apexData);
+await loggingService.Log(difference);
 

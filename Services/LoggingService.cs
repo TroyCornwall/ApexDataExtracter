@@ -1,3 +1,4 @@
+using System.Text;
 using ApexDataExtracter.Config;
 using ApexDataExtracter.Models.Apex;
 using Flurl.Http;
@@ -21,14 +22,28 @@ public class LoggingService
 
     private string ComposeLogs(ApexData apexData)
     {
-       return $"PH: {apexData.Ph}\n" +
-              $"Temp: {apexData.Temp}\n" +
-              $"Alk: {apexData.Alk}\n" +
-              $"Calcium: {apexData.Calc}\n" +
-              $"Magnesium: {apexData.Mg}\n" +
-              $"ATO: {apexData.ATO?.status[2]} - {apexData.ATO?.status[0]}\n" +
-              $"   ATO Low Underwater: {apexData.ATOLow}\n" +
-              $"   ATO High Underwater {apexData.ATOHigh}";
+        var sb = new StringBuilder();
+        if (apexData.Ph != null)
+            sb.Append($"PH: {apexData.Ph}\n");
+        if (apexData.Temp != null)
+            sb.Append($"Temp: {apexData.Temp}\n");
+        if (apexData.Alk != null)
+            sb.Append($"Alk: {apexData.Alk}\n");
+        if (apexData.Calc != null)
+            sb.Append($"Calcium: {apexData.Calc}\n");
+        if (apexData.Mg != null)
+            sb.Append($"Magnesium: {apexData.Mg}\n");
+        if (apexData.ATOStatus != null)
+            sb.Append($"ATO: {apexData.ATOStatus[2]} - {apexData.ATOStatus[0]}\n");
+        if (apexData.ATOLow != null)
+            sb.Append($"   ATO Low Underwater: {apexData.ATOLow}\n");
+        if (apexData.ATOHigh != null)
+            sb.Append( $"   ATO High Underwater {apexData.ATOHigh}");
+
+        // if (sb.Length == 0)
+        //     sb.Append("No Changes");
+        
+        return sb.ToString();
     }
 
     private void ConsoleLog(ApexData apexData, string logMesssage)
@@ -40,8 +55,18 @@ public class LoggingService
     {       
         if (!_config.Enabled)
             return;
+
+        if (string.IsNullOrWhiteSpace(logMesssage))
+        {
+            logMesssage = "No Changes..";
+            if (apexData.Timestamp.Minute > 10)
+            {
+                return;
+            }
+        }
+        
         var attachement =
-            (apexData.ATO?.status[2] == "OK") ? null : new
+            (apexData.ATOStatus != null && apexData.ATOStatus?[2] == "OK") ? null : new
             {
                 color =  "#fc2600",
                 text =  "ATO IS FUCKED",
